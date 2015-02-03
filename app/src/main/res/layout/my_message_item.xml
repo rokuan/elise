@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="right"
+    android:padding="5px"
+    >
+    <!-- <TextView
+        android:id="@+id/user_message_item_from"
+        android:text="You"
+        android:background="@android:color/darker_gray"
+        android:textColor="@android:color/white"
+        android:padding="10px"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" /> -->
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:background="@android:color/darker_gray"
+        android:layout_marginLeft="200px"
+        android:padding="3px"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/my_message_item_content"
+            android:background="@android:color/white"
+            android:text="This is a message from Cuisse"
+            android:textColor="@android:color/darker_gray"
+            android:padding="10px"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>
