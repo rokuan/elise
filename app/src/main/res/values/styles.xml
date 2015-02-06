@@ -1,8 +1,38 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme"
+        parent="Theme.AppCompat">
+        <item tools:targetApi="11" name="android:actionBarStyle">@style/MyActionBar</item>
+
+        <item tools:targetApi="8" name="actionBarStyle">@style/MyActionBar</item>
+    </style>
+
+    <style name="AppTheme.Light"
+        parent="Theme.AppCompat.Light">
+        <item tools:targetApi="11" name="android:actionBarStyle">@style/MyActionBar</item>
+
+        <item tools:targetApi="8" name="actionBarStyle">@style/MyActionBar</item>
+    </style>
+
+    <!-- <style name="AppTheme.LightAmber"
+        parent="Theme.AppCompat.Light">
+        <item name="android:windowBackground">@color/light_amber</item>
+        <item name="android:colorBackgroundCacheHint">@color/light_amber</item>
+        <item tools:targetApi="11" name="android:actionBarStyle">@style/MyActionBar</item>
+
+        <item tools:targetApi="8" name="actionBarStyle">@style/MyActionBar</item>
+    </style> -->
+
+    <style name="MyActionBar"
+        parent="Widget.AppCompat.ActionBar">
+        <item tools:targetApi="11" name="android:titleTextStyle">@style/ActionBarColor</item>
+        <item name="android:background">@color/black</item>
+
+        <item name="titleTextStyle">@style/ActionBarColor</item>
+        <item name="background">@color/black</item>
+    </style>
+    <style name="ActionBarColor" parent="@android:style/TextAppearance">
+        <item name="android:textColor">#FFFFFF</item>
     </style>
 
 </resources>

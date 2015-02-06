@@ -23,10 +23,9 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import elise.rokuan.com.elisetalk.message.Message;
+import elise.rokuan.com.elisetalk.data.EliseMessage;
 import elise.rokuan.com.elisetalk.views.MessageView;
 
 
@@ -64,7 +63,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         messageFrame.setVisibility(View.INVISIBLE);
         connectionFrame.setVisibility(View.VISIBLE);
 
-        messages = new MessageAdapter(this, R.layout.my_message_item, new ArrayList<Message>(100));
+        messages = new MessageAdapter(this, R.layout.my_message_item, new ArrayList<EliseMessage>(100));
         messagesList.setAdapter(messages);
 
         connectButton.setOnClickListener(this);
@@ -78,17 +77,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 @Override
                 public void call(Object... args) {
                     Log.i("Socket", "connected");
-
-                    /*try {
-                        JSONObject data = new JSONObject();
-
-                        data.put("username", "Cuisse");
-
-                        socket.emit("try_connect_request", data);
-                        socket.disconnect();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }*/
                 }
 
             }).on("try_connect_response", new Emitter.Listener() {
@@ -183,7 +171,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
                         Log.i("Message keys", keysBuffer.toString());*/
 
-                        final Message msg = new Message(false, data.getString("from"), data.getString("message"));
+                        final EliseMessage msg = new EliseMessage(false, data.getString("from"), data.getString("message"));
 
                         handler.post(new Runnable() {
                             @Override
@@ -286,11 +274,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
     }
 
-    public class MessageAdapter extends ArrayAdapter<Message> {
+    public class MessageAdapter extends ArrayAdapter<EliseMessage> {
         private static final int MAX_CAPACITY = 100;
-        private List<Message> messages;
+        private List<EliseMessage> messages;
 
-        public MessageAdapter(Context context, int resource, List<Message> messagesSource) {
+        public MessageAdapter(Context context, int resource, List<EliseMessage> messagesSource) {
             super(context, resource, messagesSource);
             messages = messagesSource;
         }
@@ -301,7 +289,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
 
         @Override
-        public Message getItem(int position){
+        public EliseMessage getItem(int position){
             return messages.get(position);
         }
 

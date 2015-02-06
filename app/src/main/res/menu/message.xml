@@ -2,6 +2,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="elise.rokuan.com.elisetalk.MainActivity">
+    <item android:id="@+id/action_connect" android:title="Disconnect"
+        android:icon="@android:drawable/ic_menu_add"
+        android:orderInCategory="100" app:showAsAction="ifRoom" />
     <item android:id="@+id/action_disconnect" android:title="Disconnect"
         android:icon="@android:drawable/ic_menu_close_clear_cancel"
         android:orderInCategory="100" app:showAsAction="ifRoom" />

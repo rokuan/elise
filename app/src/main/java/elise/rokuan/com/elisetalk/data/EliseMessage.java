@@ -1,14 +1,14 @@
-package elise.rokuan.com.elisetalk.message;
+package elise.rokuan.com.elisetalk.data;
 
 /**
  * Created by LEBEAU Christophe on 02/02/2015.
  */
-public class Message {
+public class EliseMessage {
     private boolean self;
     private String from;
     private String content;
 
-    public Message(boolean userMessage, String messageFrom, String messageContent){
+    public EliseMessage(boolean userMessage, String messageFrom, String messageContent){
         this.self = userMessage;
         this.from = messageFrom;
         this.content = messageContent;

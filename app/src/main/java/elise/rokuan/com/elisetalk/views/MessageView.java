@@ -6,15 +6,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import elise.rokuan.com.elisetalk.R;
-import elise.rokuan.com.elisetalk.message.Message;
+import elise.rokuan.com.elisetalk.data.EliseMessage;
 
 /**
  * Created by LEBEAU Christophe on 03/02/2015.
  */
 public class MessageView extends LinearLayout {
-    private Message message;
+    private EliseMessage message;
 
-    public MessageView(Context context, Message msg) {
+    public MessageView(Context context, EliseMessage msg) {
         super(context);
         message = msg;
         initMessageView();
