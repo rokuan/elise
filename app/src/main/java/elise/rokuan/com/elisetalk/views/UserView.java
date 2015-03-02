@@ -11,7 +11,7 @@ import elise.rokuan.com.elisetalk.R;
 import elise.rokuan.com.elisetalk.data.User;
 
 /**
- * Created by LEBEAU Christophe on 04/02/2015.
+ * A view to display an user in the connected users list
  */
 public class UserView extends LinearLayout {
     private User user;

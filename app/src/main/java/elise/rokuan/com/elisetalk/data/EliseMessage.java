@@ -1,7 +1,7 @@
 package elise.rokuan.com.elisetalk.data;
 
 /**
- * Created by LEBEAU Christophe on 02/02/2015.
+ * This class contains the data for a single message
  */
 public class EliseMessage {
     private boolean self;

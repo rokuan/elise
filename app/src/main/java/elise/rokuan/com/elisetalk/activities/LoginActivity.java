@@ -20,10 +20,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import elise.rokuan.com.elisetalk.R;
+import elise.rokuan.com.elisetalk.data.User;
 import elise.rokuan.com.elisetalk.service.MessageService;
 
 /**
- * Created by LEBEAU Christophe on 04/02/2015.
+ * Main activity to log the user in
  */
 public class LoginActivity extends Activity implements View.OnClickListener {
     private EditText loginText;
@@ -31,7 +32,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     private MessageService service;
 
-    //private Messenger serviceMessenger = new Messenger(new IMHandler());
+    private Messenger loginMessenger = new Messenger(new IMHandler());
     private Messenger serviceMessenger;
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -73,6 +74,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     try {
                         if(data.getBoolean("result")){
                             Log.i("Login result", "SUCCESS");
+                            connectUser(new User(data.getLong("id"), data.getString("username")));
                         } else {
                             Log.i("Login result", "ERROR (" + data.getString("errorMessage") + ")");
                         }
@@ -92,33 +94,54 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
         loginText = (EditText)findViewById(R.id.login_field);
         findViewById(R.id.login_button).setOnClickListener(this);
-        findViewById(R.id.logout_button).setOnClickListener(this);
+        //findViewById(R.id.logout_button).setOnClickListener(this);
 
-        startMessagingService();
+        //startMessagingService();
+    }
+
+    private void connectUser(User user){
+        Intent userIntent = new Intent(LoginActivity.this, MessageActivity.class);
+        userIntent.putExtra("id", user.getId());
+        userIntent.putExtra("name", user.getName());
+        startActivity(userIntent);
     }
 
     @Override
     public void onStart(){
         super.onStart();
-        bindService(new Intent(this, MessageService.class), serviceConnection,
-                Context.BIND_AUTO_CREATE);
+        startMessagingService();
     }
+
+    /*@Override
+    public void onPause(){
+        super.onPause();
+        stopMessagingService();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        startMessagingService();
+    }*/
 
     @Override
     protected void onStop() {
         super.onStop();
+        stopMessagingService();
+    }
+
+    private void startMessagingService(){
+        startService(new Intent(LoginActivity.this, MessageService.class));
+        bindService(new Intent(this, MessageService.class), serviceConnection,
+                Context.BIND_AUTO_CREATE);
+    }
+
+    private void stopMessagingService(){
         // Unbind from the service
         if (bound) {
             unbindService(serviceConnection);
             bound = false;
         }
-    }
-
-    private void startMessagingService(){
-        startService(new Intent(LoginActivity.this, MessageService.class));
-    }
-
-    private void stopMessagingService(){
         stopService(new Intent(LoginActivity.this, MessageService.class));
     }
 
@@ -139,6 +162,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     }
 
                     msg = Message.obtain(null, MessageService.LOGIN_REQUEST, data);
+                    msg.replyTo = loginMessenger;
+
                     try {
                         serviceMessenger.send(msg);
                     } catch (RemoteException e) {
@@ -147,7 +172,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 }
                 break;
 
-            case R.id.logout_button:
+            /*case R.id.logout_button:
                 //stopMessagingService();
                 msg = Message.obtain(null, MessageService.LOGOUT);
                 try {
@@ -155,7 +180,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
-                break;
+                break;*/
         }
     }
 }

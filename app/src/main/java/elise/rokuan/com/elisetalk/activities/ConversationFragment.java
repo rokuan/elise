@@ -19,7 +19,7 @@ import elise.rokuan.com.elisetalk.data.User;
 import elise.rokuan.com.elisetalk.views.MessageView;
 
 /**
- * Created by LEBEAU Christophe on 05/02/2015.
+ * A fragment containing a form to send and receive messages
  */
 public class ConversationFragment extends Fragment implements View.OnClickListener {
     private User user;
@@ -50,6 +50,11 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
     }
 
     //public void appendMessage(User from, )
+
+    /**
+     * Appends a new message to the conversation
+     * @param message the message to be added
+     */
     public void appendMessage(EliseMessage message){
         /*if(adapter == null){
             adapter = new MessageAdapter(this.getActivity(), R.layout.user_message_item, new ArrayList<EliseMessage>());

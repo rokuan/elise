@@ -20,23 +20,24 @@ import org.json.JSONObject;
 import java.net.URISyntaxException;
 
 /**
- * Created by LEBEAU Christophe on 04/02/2015.
+ * The service that acts as an intermediary between the node.js server and the Android activity
  */
 public class MessageService extends Service {
     public static final int LOGIN_REQUEST = 0;
     public static final int LOGIN_RESPONSE = 1;
-    public static final int ONLINE_USERS = 2;
-    public static final int USER_STATUS_CHANGE = 3;
-    public static final int STATUS_CHANGE = 4;
-    public static final int USER_CONNECT = 5;
-    public static final int USER_DISCONNECT = 6;
-    public static final int NEW_USER_MESSAGE = 7;
-    public static final int NEW_GROUP_MESSAGE = 8;
-    public static final int SEND_MESSAGE = 9;
-    public static final int SEND_GROUP_MESSAGE = 10;
-    public static final int MESSAGE_NOT_DELIVERED = 11;
-    public static final int GROUP_MESSAGE_NOT_DELIVERED = 12;
-    public static final int LOGOUT = 13;
+    public static final int ONLINE_USERS_REQUEST = 2;
+    public static final int ONLINE_USERS_RESPONSE = 3;
+    public static final int USER_STATUS_CHANGE = 4;
+    public static final int STATUS_CHANGE = 5;
+    public static final int USER_CONNECT = 6;
+    public static final int USER_DISCONNECT = 7;
+    public static final int NEW_USER_MESSAGE = 8;
+    public static final int NEW_GROUP_MESSAGE = 9;
+    public static final int SEND_MESSAGE = 10;
+    public static final int SEND_GROUP_MESSAGE = 11;
+    public static final int MESSAGE_NOT_DELIVERED = 12;
+    public static final int GROUP_MESSAGE_NOT_DELIVERED = 13;
+    public static final int LOGOUT = 14;
 
     private static final String MESSAGE_SERVICE_TAG = "EliseMessageService";
     private static final String SERVER_ADDRESS = "http://focused.azurewebsites.net/";
@@ -50,13 +51,19 @@ public class MessageService extends Service {
     class IMHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            JSONObject data;
+            //JSONObject data;
 
             switch (msg.what) {
                 case LOGIN_REQUEST:
                     Log.i("MessageService", "LOGIN_REQUEST");
                     activityMessenger = msg.replyTo;
-                    socket.emit("try_connect_request", msg.obj);
+                    socket.emit("login_request", msg.obj);
+                    break;
+
+                case ONLINE_USERS_REQUEST:
+                    //Log.i("MessageService", "ONLINE_USERS_REQUEST");
+                    activityMessenger = msg.replyTo;
+                    socket.emit("online_users_request", msg.obj);
                     break;
 
                 case STATUS_CHANGE:
@@ -99,22 +106,22 @@ public class MessageService extends Service {
                     Log.i("Socket", "connected");
                 }
 
-            }).on("try_connect_response", new Emitter.Listener() {
+            }).on("login_response", new Emitter.Listener() {
 
                 @Override
                 public void call(Object... args) {
-                    Log.i("Socket", "try_connect_response");
+                    Log.i("Socket", "login_response");
 
                     sendEliseMessage(LOGIN_RESPONSE, args[0]);
                 }
 
-            }).on("online_users", new Emitter.Listener() {
+            }).on("online_users_response", new Emitter.Listener() {
 
                 @Override
                 public void call(Object... args) {
-                    Log.i("Socket", "online_users");
+                    Log.i("Socket", "online_users_response");
 
-                    sendEliseMessage(ONLINE_USERS, args[0]);
+                    sendEliseMessage(ONLINE_USERS_RESPONSE, args[0]);
                 }
 
             }).on("user_status_change", new Emitter.Listener() {
@@ -196,15 +203,15 @@ public class MessageService extends Service {
         }
     }
 
-    /*@Override
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return Service.START_STICKY;
-    }*/
+    }
 
-    @Override
+    /*@Override
     public void onDestroy(){
         if(socket != null && socket.connected()){
             socket.disconnect();
         }
-    }
+    }*/
 }

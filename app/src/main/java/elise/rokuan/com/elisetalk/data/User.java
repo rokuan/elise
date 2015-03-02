@@ -3,7 +3,7 @@ package elise.rokuan.com.elisetalk.data;
 import elise.rokuan.com.elisetalk.R;
 
 /**
- * Created by LEBEAU Christophe on 04/02/2015.
+ * Class to store a contact's name or status who is identified by an unique ID
  */
 public class User {
     private Long id;

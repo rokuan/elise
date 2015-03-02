@@ -9,7 +9,7 @@ import elise.rokuan.com.elisetalk.R;
 import elise.rokuan.com.elisetalk.data.EliseMessage;
 
 /**
- * Created by LEBEAU Christophe on 03/02/2015.
+ * A view to display the content of a message
  */
 public class MessageView extends LinearLayout {
     private EliseMessage message;

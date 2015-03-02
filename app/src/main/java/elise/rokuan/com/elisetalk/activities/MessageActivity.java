@@ -42,8 +42,11 @@ import elise.rokuan.com.elisetalk.data.EliseMessage;
 import elise.rokuan.com.elisetalk.data.User;
 import elise.rokuan.com.elisetalk.service.MessageService;
 
+/**
+ * Activity to manage contacts and messages
+ */
 public class MessageActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, View.OnClickListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -60,7 +63,7 @@ public class MessageActivity extends ActionBarActivity
     private EditText loginText;*/
     private boolean bound;
 
-    //private User thisUser;
+    private User thisUser;
 
     //private Messenger serviceMessenger = new Messenger(new IMHandler());
     private Messenger activityMessenger = new Messenger(new IMHandler());
@@ -70,6 +73,14 @@ public class MessageActivity extends ActionBarActivity
         public void onServiceConnected(ComponentName name, IBinder service) {
             serviceMessenger = new Messenger(service);
             bound = true;
+
+            Message msg = Message.obtain(null, MessageService.ONLINE_USERS_REQUEST, new JSONObject());
+            msg.replyTo = activityMessenger;
+            try {
+                serviceMessenger.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -119,22 +130,26 @@ public class MessageActivity extends ActionBarActivity
                     }
                     break;
 
-                case MessageService.ONLINE_USERS:
+                case MessageService.ONLINE_USERS_RESPONSE:
                     data = (JSONObject)msg.obj;
                     try {
-                        JSONArray users = data.getJSONArray("users");
-                        System.out.println(users);
-                        List<User> onlineUsers = new ArrayList<>(users.length());
+                        if(data.getBoolean("result")) {
+                            JSONArray users = data.getJSONArray("users");
+                            //System.out.println(users);
+                            List<User> onlineUsers = new ArrayList<>(users.length());
 
-                        for(int i=0; i<users.length(); i++){
-                            //mNavigationDrawerFragment.onUserConnected();
-                            JSONObject userElement = users.getJSONObject(i);
-                            User u = new User(userElement.getLong("id"), userElement.getString("username"), userElement.getString("status"));
-                            onlineUsers.add(u);
-                            allUsers.put(u.getId(), u);
+                            for (int i = 0; i < users.length(); i++) {
+                                //mNavigationDrawerFragment.onUserConnected();
+                                JSONObject userElement = users.getJSONObject(i);
+                                User u = new User(userElement.getLong("id"), userElement.getString("username"), userElement.getString("status"));
+                                onlineUsers.add(u);
+                                allUsers.put(u.getId(), u);
+                            }
+
+                            mNavigationDrawerFragment.setOnlineUsers(onlineUsers);
+                        } else {
+                            // TODO: afficher une erreur
                         }
-
-                        mNavigationDrawerFragment.setOnlineUsers(onlineUsers);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -194,9 +209,16 @@ public class MessageActivity extends ActionBarActivity
 
         //setupCustomActionBar();
 
+
+        Bundle extras = this.getIntent().getExtras();
+
+        thisUser = new User(extras.getLong("id"), extras.getString("name"));
+        ActionBar actionBar = this.getSupportActionBar();
+        actionBar.setTitle(thisUser.getName());
+
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
+        //mTitle = getTitle();
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
@@ -207,7 +229,12 @@ public class MessageActivity extends ActionBarActivity
         findViewById(R.id.login_button).setOnClickListener(this);
         findViewById(R.id.logout_button).setOnClickListener(this);*/
 
-        startMessagingService();
+        //startMessagingService();
+    }
+
+    @Override
+    public void onBackPressed () {
+        this.moveTaskToBack(true);
     }
 
     @Override
@@ -227,21 +254,21 @@ public class MessageActivity extends ActionBarActivity
         }
     }
 
-    private void startMessagingService(){
+    /*private void startMessagingService(){
         startService(new Intent(MessageActivity.this, MessageService.class));
     }
 
     private void stopMessagingService(){
         stopService(new Intent(MessageActivity.this, MessageService.class));
-    }
+    }*/
 
-    private void setupCustomActionBar(){
+    /*private void setupCustomActionBar(){
         ActionBar bar = this.getSupportActionBar();
 
         View customBar = ((LayoutInflater)this.getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.chat_action_bar, null);
         customBar.findViewById(R.id.chat_disconnect_button);
         bar.setCustomView(customBar);
-    }
+    }*/
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
@@ -275,6 +302,11 @@ public class MessageActivity extends ActionBarActivity
         //actionBar.setTitle(mTitle);
     }
 
+    /**
+     * Sends a new message to the specified user
+     * @param user the target
+     * @param emsg the message to be sent
+     */
     public void sendMessage(User user, EliseMessage emsg){
         JSONObject data = new JSONObject();
 
@@ -295,6 +327,11 @@ public class MessageActivity extends ActionBarActivity
         }
     }
 
+    /**
+     * Called when a new message was sent from another user
+     * @param user the sender
+     * @param message the message
+     */
     private void newUserMessage(User user, EliseMessage message){
         if(!allConversations.containsKey(user.getId())){
             createConversation(user);
@@ -303,6 +340,10 @@ public class MessageActivity extends ActionBarActivity
         allConversations.get(user.getId()).appendMessage(message);
     }
 
+    /**
+     * Open the conversation associated with the user. Creates the conversation if there is none
+     * @param user the contact
+     */
     public void openUserConversation(User user){
         if(!allConversations.containsKey(user.getId())){
             createConversation(user);
@@ -314,6 +355,10 @@ public class MessageActivity extends ActionBarActivity
                 .commit();
     }
 
+    /**
+     * Creates a new conversation fragment for the specified user
+     * @param user
+     */
     private void createConversation(User user){
         ConversationFragment conv = ConversationFragment.newInstance(user);
         allConversations.put(user.getId(), conv);
@@ -342,25 +387,26 @@ public class MessageActivity extends ActionBarActivity
         //noinspection SimplifiableIfStatement
         //if (id == R.id.action_settings) {
         switch(id){
-            case R.id.action_connect:
-                connectAs("Babouinours");
-                return true;
-
             case R.id.action_disconnect:
                 Message msg = Message.obtain(null, MessageService.LOGOUT, new JSONObject());
                 msg.replyTo = activityMessenger;
 
+                // TODO: afficher une dialog qui demande confirmation
+
                 try {
                     serviceMessenger.send(msg);
                 } catch (RemoteException e) {
-                    e.printStackTrace();
+                    Log.e("EliseTalk - Disconnect", e.getMessage());
                 }
+
+                this.finish();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    /*
     public void connectAs(String username){
         Message msg;
         JSONObject data = new JSONObject();
@@ -380,33 +426,7 @@ public class MessageActivity extends ActionBarActivity
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onClick(View v) {
-        Message msg;
-
-        switch(v.getId()){
-            /*case R.id.login_button:
-                if(loginText.getText().length() > 0){
-                    connectAs(loginText.getText().toString().trim());
-                }
-                break;
-
-            case R.id.logout_button:
-                //stopMessagingService();
-                msg = Message.obtain(null, MessageService.LOGOUT);
-                msg.replyTo = activityMessenger;
-
-                try {
-                    serviceMessenger.send(msg);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-                break;
-                */
-        }
-    }
+    }*/
 
     /**
      * A placeholder fragment containing a simple view.
